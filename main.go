@@ -54,7 +54,7 @@ type Course struct {
 	Term        uint64
 	Credits     uint64
 	Weight      uint64
-	Learned     bool
+	LearnedTime uint64
 	Classes     map[string]*Class
 	PreCourses  []*Course
 	PostCourses []*Course
@@ -226,6 +226,7 @@ func ParseOutput(
 			return
 		}
 		currentClasses := []*Class{}
+		var termCredits uint64
 		for classesCount > 0 {
 			var courseCode, classCode string
 			courseCode, err = r.GetString()
@@ -247,7 +248,7 @@ func ParseOutput(
 				err = fmt.Errorf("the term of course %s is incorrect", courseCode)
 				return
 			}
-			if course.Learned {
+			if course.LearnedTime > 0 {
 				err = fmt.Errorf("course %s already learned", courseCode)
 				return
 			}
@@ -255,18 +256,24 @@ func ParseOutput(
 				res.OptionalScore += course.Weight
 			}
 			for _, preCourse := range course.PreCourses {
-				if !preCourse.Learned {
+				if preCourse.LearnedTime == 0 {
 					err = fmt.Errorf("pre-course %s not learned", preCourse.Code)
+					return
 				}
 			}
 			for _, postCourse := range course.PostCourses {
-				if postCourse.Learned {
+				if postCourse.LearnedTime == termsLimit+1 {
 					res.PostCoursesCount++
 				}
 			}
 			currentClasses = append(currentClasses, class)
+			termCredits += course.Credits
 			res.CompulsoryCount++
 			classesCount--
+		}
+		if termCredits > creditsLimit {
+			err = fmt.Errorf("credits exceeded %v", creditsLimit)
+			return
 		}
 		for i := 0; i < len(currentClasses); i++ {
 			for j := i + 1; j < len(currentClasses); j++ {
@@ -287,7 +294,7 @@ func ParseOutput(
 			}
 		}
 		for _, class := range currentClasses {
-			class.Course.Learned = true
+			class.Course.LearnedTime = termsLimit
 		}
 		termsLimit--
 	}

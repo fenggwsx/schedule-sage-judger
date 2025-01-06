@@ -1,0 +1,16 @@
+edition: 3.0.0
+name: schedule-sage-judger
+
+resources:
+  schedule-sage-judger:
+    component: fc3 
+    props:
+      region: ${env('DEPLOY_REGION', 'cn-hongkong')}
+      functionName: ${env('FUNCTION_NAME', 'schedule-sage-judger')}
+      runtime: go1
+      memorySize: 1024
+      cpu: 1
+      diskSize: 512
+      code: build
+      handler: main
+      timeout: 60

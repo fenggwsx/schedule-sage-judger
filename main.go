@@ -268,7 +268,9 @@ func ParseOutput(
 			}
 			currentClasses = append(currentClasses, class)
 			termCredits += course.Credits
-			res.CompulsoriesCount++
+			if course.Weight == 0 {
+				res.CompulsoriesCount++
+			}
 			classesCount--
 		}
 		if termCredits > creditsLimit {

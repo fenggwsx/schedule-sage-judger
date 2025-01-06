@@ -398,6 +398,11 @@ type JudgeResult struct {
 
 func HandleRequest(event HTTPTriggerEvent) (*HTTPTriggerResponse, error) {
 	reqBody := &RequestBody{}
+
+	if event.Body == nil {
+		return BadRequest("the request did not come from an HTTP Trigger"), nil
+	}
+
 	if event.IsBase64Encoded != nil && *event.IsBase64Encoded {
 		decodedByte, err := base64.StdEncoding.DecodeString(*event.Body)
 		if err != nil {

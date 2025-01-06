@@ -205,9 +205,9 @@ func ParseInput(r *Reader) (classes map[string]*Class, creditsLimit uint64, term
 }
 
 type ParseOutputResult struct {
-	CompulsoryCount  uint64 `json:"compulsory_count"`
-	PostCoursesCount uint64 `json:"post_courses_count"`
-	OptionalScore    uint64 `json:"optional_score"`
+	CompulsoriesCount uint64 `json:"compulsories_count"`
+	PostCoursesCount  uint64 `json:"post_courses_count"`
+	OptionalScores    uint64 `json:"optional_scores"`
 }
 
 func ParseOutput(
@@ -253,7 +253,7 @@ func ParseOutput(
 				return
 			}
 			if course.Weight > 0 {
-				res.OptionalScore += course.Weight
+				res.OptionalScores += course.Weight
 			}
 			for _, preCourse := range course.PreCourses {
 				if preCourse.LearnedTime == 0 {
@@ -268,7 +268,7 @@ func ParseOutput(
 			}
 			currentClasses = append(currentClasses, class)
 			termCredits += course.Credits
-			res.CompulsoryCount++
+			res.CompulsoriesCount++
 			classesCount--
 		}
 		if termCredits > creditsLimit {
@@ -397,11 +397,11 @@ func Ok(data any) *HTTPTriggerResponse {
 }
 
 type JudgeResult struct {
-	CompulsoryCount  uint64 `json:"compulsory_count"`
-	PostCoursesCount uint64 `json:"post_courses_count"`
-	OptionalScore    uint64 `json:"optional_score"`
-	Status           uint64 `json:"status"`
-	Comment          string `json:"comment"`
+	CompulsoriesCount uint64 `json:"compulsories_count"`
+	PostCoursesCount  uint64 `json:"post_courses_count"`
+	OptionalScores    uint64 `json:"optional_scores"`
+	Status            uint64 `json:"status"`
+	Comment           string `json:"comment"`
 }
 
 func HandleRequest(event HTTPTriggerEvent) (*HTTPTriggerResponse, error) {
@@ -445,11 +445,11 @@ func HandleRequest(event HTTPTriggerEvent) (*HTTPTriggerResponse, error) {
 		}), nil
 	}
 	return Ok(&JudgeResult{
-		CompulsoryCount:  res.CompulsoryCount,
-		PostCoursesCount: res.PostCoursesCount,
-		OptionalScore:    res.OptionalScore,
-		Status:           1,
-		Comment:          "accepted",
+		CompulsoriesCount: res.CompulsoriesCount,
+		PostCoursesCount:  res.PostCoursesCount,
+		OptionalScores:    res.OptionalScores,
+		Status:            1,
+		Comment:           "Accepted",
 	}), nil
 }
 

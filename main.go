@@ -336,22 +336,20 @@ type FailResponseBody struct {
 	Message string `json:"message"`
 }
 
-func InternalServerError() (resp *HTTPTriggerResponse) {
-	resp.StatusCode = http.StatusBadRequest
+func InternalServerError() *HTTPTriggerResponse {
 	body := &FailResponseBody{
 		Success: false,
-		Code:    http.StatusBadRequest,
+		Code:    http.StatusInternalServerError,
 		Message: "internal server error",
 	}
-	bytes, err := json.Marshal(body)
-	if err == nil {
-		resp.Body = string(bytes)
+	bytes, _ := json.Marshal(body)
+	return &HTTPTriggerResponse{
+		StatusCode: http.StatusInternalServerError,
+		Body:       string(bytes),
 	}
-	return resp
 }
 
-func BadRequest(msg string) (resp *HTTPTriggerResponse) {
-	resp.StatusCode = http.StatusBadRequest
+func BadRequest(msg string) *HTTPTriggerResponse {
 	body := &FailResponseBody{
 		Success: false,
 		Code:    http.StatusBadRequest,
@@ -361,8 +359,10 @@ func BadRequest(msg string) (resp *HTTPTriggerResponse) {
 	if err != nil {
 		return InternalServerError()
 	}
-	resp.Body = string(bytes)
-	return resp
+	return &HTTPTriggerResponse{
+		StatusCode: http.StatusBadRequest,
+		Body:       string(bytes),
+	}
 }
 
 type SuccessResponseBody struct {
@@ -372,11 +372,10 @@ type SuccessResponseBody struct {
 	Data    any
 }
 
-func Ok(data any) (resp *HTTPTriggerResponse) {
-	resp.StatusCode = http.StatusOK
+func Ok(data any) *HTTPTriggerResponse {
 	body := &SuccessResponseBody{
-		Success: false,
-		Code:    http.StatusBadRequest,
+		Success: true,
+		Code:    http.StatusOK,
 		Message: "ok",
 		Data:    data,
 	}
@@ -384,8 +383,10 @@ func Ok(data any) (resp *HTTPTriggerResponse) {
 	if err != nil {
 		return InternalServerError()
 	}
-	resp.Body = string(bytes)
-	return resp
+	return &HTTPTriggerResponse{
+		StatusCode: http.StatusOK,
+		Body:       string(bytes),
+	}
 }
 
 type JudgeResult struct {
